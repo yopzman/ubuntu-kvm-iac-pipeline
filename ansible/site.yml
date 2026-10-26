@@ -1,5 +1,5 @@
 ---
-- name: Inisialisasi semua node cluster (master + worker)
+- name: Initialize all cluster nodes (master + workers)
   hosts: all
   become: true
   gather_facts: true

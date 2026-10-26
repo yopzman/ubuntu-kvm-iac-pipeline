@@ -1,12 +1,12 @@
 ---
-- name: Muat modul kernel untuk runtime container
+- name: Load kernel modules required by container runtimes
   ansible.builtin.command: "modprobe {{ item }}"
   loop:
     - overlay
     - br_netfilter
   changed_when: false
 
-- name: Persistensi modul kernel saat boot
+- name: Persist kernel modules across reboots
   ansible.builtin.copy:
     dest: /etc/modules-load.d/k8s.conf
     owner: root
@@ -16,14 +16,14 @@
       overlay
       br_netfilter
 
-- name: Terapkan sysctl untuk workload container
+- name: Apply sysctl settings for container workloads
   ansible.builtin.copy:
     dest: /etc/sysctl.d/99-container.conf
     owner: root
     group: root
     mode: "0644"
     content: |
-      # Sysctl prasyarat container/Kubernetes - dikelola Ansible
+      # Sysctl prerequisites for containers/Kubernetes - managed by Ansible
       net.bridge.bridge-nf-call-iptables  = 1
       net.bridge.bridge-nf-call-ip6tables = 1
       net.ipv4.ip_forward                 = 1

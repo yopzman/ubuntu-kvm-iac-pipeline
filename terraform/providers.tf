@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "libvirt" {
-  # Jalankan dari host Ubuntu dengan libvirt daemon aktif.
-  # Pastikan user Anda tergabung di grup libvirt & kvm.
+  # Run from an Ubuntu host with the libvirt daemon running.
+  # Make sure your user is a member of the libvirt & kvm groups.
   uri = var.libvirt_uri
 }

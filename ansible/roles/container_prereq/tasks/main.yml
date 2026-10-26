@@ -1,5 +1,5 @@
 ---
-- name: Install containerd dan paket pendukung
+- name: Install containerd and supporting packages
   ansible.builtin.apt:
     name:
       - containerd
@@ -7,26 +7,26 @@
       - socat
     state: present
 
-- name: Generate konfigurasi default containerd
+- name: Generate default containerd configuration
   ansible.builtin.shell: "containerd config default > /etc/containerd/config.toml"
   args:
     creates: /etc/containerd/config.toml
 
-- name: Aktifkan systemd cgroup driver
+- name: Enable the systemd cgroup driver
   ansible.builtin.lineinfile:
     path: /etc/containerd/config.toml
     regexp: '^\s*SystemdCgroup\s*=.*$'
     line: '          SystemdCgroup = true'
   notify: Restart containerd
 
-- name: Set sandbox image (pause) agar kompatibel Kubernetes
+- name: Set sandbox image (pause) for Kubernetes compatibility
   ansible.builtin.lineinfile:
     path: /etc/containerd/config.toml
     regexp: '^\s*sandbox_image\s*=.*$'
     line: '  sandbox_image = "registry.k8s.io/pause:3.9"'
   notify: Restart containerd
 
-- name: Aktifkan dan jalankan containerd
+- name: Enable and start containerd
   ansible.builtin.service:
     name: containerd
     state: started

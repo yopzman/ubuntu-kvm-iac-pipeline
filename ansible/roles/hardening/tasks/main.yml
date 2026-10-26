@@ -1,5 +1,5 @@
 ---
-- name: Hardening konfigurasi SSH (drop-in sshd)
+- name: Harden SSH configuration (sshd drop-in)
   ansible.builtin.blockinfile:
     path: /etc/ssh/sshd_config.d/99-hardening.conf
     create: true
@@ -7,7 +7,7 @@
     group: root
     mode: "0644"
     block: |
-      # Hardening SSH - dikelola oleh Ansible
+      # SSH hardening - managed by Ansible
       PermitRootLogin no
       PasswordAuthentication no
       KbdInteractiveAuthentication no
@@ -18,17 +18,17 @@
       LoginGraceTime 30
   notify: Restart ssh
 
-- name: Izinkan OpenSSH lewat UFW
+- name: Allow OpenSSH through UFW
   ansible.builtin.ufw:
     rule: allow
     name: OpenSSH
 
-- name: Kebijakan default deny incoming
+- name: Set default incoming policy to deny
   ansible.builtin.ufw:
     default: deny
     direction: incoming
 
-- name: Aktifkan UFW
+- name: Enable UFW
   ansible.builtin.ufw:
     state: enabled
 
@@ -37,7 +37,7 @@
     name: unattended-upgrades
     state: present
 
-- name: Aktifkan security update otomatis
+- name: Enable automatic security updates
   ansible.builtin.copy:
     dest: /etc/apt/apt.conf.d/20auto-upgrades
     owner: root
@@ -47,14 +47,14 @@
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Unattended-Upgrade "1";
 
-- name: Hapus user builder 'packer' dari golden image
+- name: Remove the 'packer' builder user from the golden image
   ansible.builtin.user:
     name: packer
     state: absent
     remove: true
     force: true
 
-- name: Hapus sudoers sementara milik user packer
+- name: Remove the temporary sudoers file for the packer user
   ansible.builtin.file:
     path: /etc/sudoers.d/99-packer
     state: absent

@@ -8,55 +8,55 @@ packer {
 }
 
 # ---------------------------------------------------------------------------
-# Variabel build
+# Build variables
 # ---------------------------------------------------------------------------
 
 variable "ubuntu_version" {
   type        = string
   default     = "24.04.2"
-  description = "Point release Ubuntu Server LTS yang dipakai sebagai sumber ISO."
+  description = "Ubuntu Server LTS point release used as the ISO source."
 }
 
 variable "iso_url" {
   type        = string
   default     = "https://releases.ubuntu.com/noble/ubuntu-24.04.2-live-server-amd64.iso"
-  description = "URL ISO Ubuntu live-server (override untuk point release lebih baru)."
+  description = "Ubuntu live-server ISO URL (override for a newer point release)."
 }
 
 variable "iso_checksum" {
   type        = string
   default     = "file:https://releases.ubuntu.com/noble/SHA256SUMS"
-  description = "Checksum file ISO (format file: agar otomatis dicocokkan dari SHA256SUMS)."
+  description = "ISO checksum (file: prefix auto-matches the ISO name against SHA256SUMS)."
 }
 
 variable "disk_size" {
   type        = string
   default     = "20G"
-  description = "Ukuran disk root golden image."
+  description = "Root disk size of the golden image."
 }
 
 variable "memory" {
   type        = number
   default     = 4096
-  description = "RAM (MiB) untuk VM builder saat proses instalasi."
+  description = "RAM (MiB) for the builder VM during installation."
 }
 
 variable "cpus" {
   type        = number
   default     = 2
-  description = "Jumlah vCPU untuk VM builder."
+  description = "Number of vCPUs for the builder VM."
 }
 
 variable "ssh_username" {
   type        = string
   default     = "packer"
-  description = "User sementara yang dibuat autoinstall untuk akses Packer."
+  description = "Temporary user created by autoinstall for Packer access."
 }
 
 variable "ssh_password" {
   type        = string
   default     = "packer"
-  description = "Password user sementara (hash-nya tertanam di http/user-data)."
+  description = "Password for the temporary user (its hash is embedded in http/user-data)."
 }
 
 # ---------------------------------------------------------------------------
@@ -76,8 +76,8 @@ source "qemu" "ubuntu" {
   memory      = var.memory
   headless    = true
 
-  # Autoinstall diambil dari HTTP server bawaan Packer (direktori http/):
-  # ds=nocloud-net membaca user-data + meta-data dari s=http://<host>:<port>/
+  # Autoinstall is fetched from Packer's built-in HTTP server (http/ directory):
+  # ds=nocloud-net reads user-data + meta-data from s=http://<host>:<port>/
   http_directory = "http"
   boot_wait      = "5s"
   boot_command = [
@@ -95,7 +95,7 @@ source "qemu" "ubuntu" {
 }
 
 # ---------------------------------------------------------------------------
-# Build: update paket, lalu tulis manifest
+# Build: update packages, then write the manifest
 # ---------------------------------------------------------------------------
 
 build {

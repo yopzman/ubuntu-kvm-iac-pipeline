@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# Definisi node: 1 master + N worker
+# Node definitions: 1 master + N workers
 # ---------------------------------------------------------------------------
 
 locals {
@@ -23,7 +23,7 @@ locals {
 }
 
 # ---------------------------------------------------------------------------
-# Storage pool & golden image dari Packer
+# Storage pool & golden image from Packer
 # ---------------------------------------------------------------------------
 
 resource "libvirt_pool" "vms" {
@@ -40,7 +40,7 @@ resource "libvirt_volume" "base" {
 }
 
 # ---------------------------------------------------------------------------
-# Cloud-init per node (hostname + user admin + SSH key)
+# Per-node cloud-init (hostname + admin user + SSH key)
 # ---------------------------------------------------------------------------
 
 resource "libvirt_cloudinit_disk" "node" {
@@ -71,7 +71,7 @@ resource "libvirt_cloudinit_disk" "node" {
 }
 
 # ---------------------------------------------------------------------------
-# Disk node (backing file ke golden image)
+# Node disks (backing files of the golden image)
 # ---------------------------------------------------------------------------
 
 resource "libvirt_volume" "node" {
@@ -84,7 +84,7 @@ resource "libvirt_volume" "node" {
 }
 
 # ---------------------------------------------------------------------------
-# Domain (VM) — 1 master + 2 worker
+# Domains (VMs) — 1 master + 2 workers
 # ---------------------------------------------------------------------------
 
 resource "libvirt_domain" "node" {
@@ -101,7 +101,7 @@ resource "libvirt_domain" "node" {
 
   network_interface {
     network_name   = var.network_name
-    wait_for_lease = true # tunggu IP DHCP agar tersedia di output
+    wait_for_lease = true # wait for the DHCP lease so the IP shows up in outputs
   }
 
   console {

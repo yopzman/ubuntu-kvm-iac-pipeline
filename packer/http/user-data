@@ -1,7 +1,7 @@
 #cloud-config
-# Autoinstall Ubuntu Server untuk Packer QEMU builder.
-# Password di bawah adalah hash SHA-512 dari "packer" (user sementara,
-# akan dihapus oleh role Ansible "hardening" setelah provisioning).
+# Ubuntu Server autoinstall for the Packer QEMU builder.
+# The password below is the SHA-512 hash of "packer" (temporary user,
+# removed by the Ansible "hardening" role after provisioning).
 autoinstall:
   version: 1
   locale: en_US.UTF-8

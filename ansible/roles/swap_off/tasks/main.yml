@@ -1,15 +1,15 @@
 ---
-- name: Cek swap yang sedang aktif
+- name: Check for active swap
   ansible.builtin.command: swapon --show=NAME --noheadings
   register: swap_devices
   changed_when: false
 
-- name: Matikan semua swap
+- name: Disable all swap
   ansible.builtin.command: swapoff -a
   when: swap_devices.stdout | length > 0
 
-- name: Komentari entri swap di /etc/fstab
+- name: Comment out swap entries in /etc/fstab
   ansible.builtin.replace:
     path: /etc/fstab
     regexp: '^([^#\s].*\s+swap\s+.*)$'
-    replace: '# \1  # dinonaktifkan oleh Ansible (swap_off)'
+    replace: '# \1  # disabled by Ansible (swap_off)'

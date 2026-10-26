@@ -1,5 +1,5 @@
 output "master_ips" {
-  description = "IP DHCP VM master (untuk grup [master] di inventory Ansible)."
+  description = "DHCP IPs of the master VMs (for the [master] group in the Ansible inventory)."
   value = [
     for name, dom in libvirt_domain.node :
     dom.network_interface[0].addresseses[0]
@@ -8,7 +8,7 @@ output "master_ips" {
 }
 
 output "worker_ips" {
-  description = "IP DHCP VM worker (untuk grup [workers] di inventory Ansible)."
+  description = "DHCP IPs of the worker VMs (for the [workers] group in the Ansible inventory)."
   value = [
     for name, dom in libvirt_domain.node :
     dom.network_interface[0].addresseses[0]
@@ -17,7 +17,7 @@ output "worker_ips" {
 }
 
 output "all_nodes" {
-  description = "Peta hostname -> IP untuk semua node."
+  description = "Map of hostname -> IP for all nodes."
   value = {
     for name, dom in libvirt_domain.node :
     name => dom.network_interface[0].addresseses[0]

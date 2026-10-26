@@ -15,7 +15,7 @@ terraform/crash.log
 ansible/*.retry
 ansible/hosts
 
-# Umum
+# General
 *.log
 *.swp
 .DS_Store
