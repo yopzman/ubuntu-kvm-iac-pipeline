@@ -90,10 +90,11 @@ resource "libvirt_volume" "node" {
 resource "libvirt_domain" "node" {
   for_each = local.nodes
 
-  name      = "${var.cluster_name}-${each.key}"
-  memory    = each.value.memory # MiB
-  vcpu      = each.value.vcpu
-  cloudinit = libvirt_cloudinit_disk.node[each.key].id
+  name       = "${var.cluster_name}-${each.key}"
+  memory     = each.value.memory # MiB
+  vcpu       = each.value.vcpu
+  cloudinit  = libvirt_cloudinit_disk.node[each.key].id
+  qemu_agent = true # agent is baked into the image; speeds up IP detection
 
   disk {
     volume_id = libvirt_volume.node[each.key].id

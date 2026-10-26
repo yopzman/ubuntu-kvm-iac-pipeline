@@ -1,0 +1,20 @@
+---
+# Kubernetes bootstrap: run AFTER site.yml (all baseline roles) and once the
+# inventory has been generated (make configure already depends on inventory).
+- name: Install Kubernetes packages on all nodes
+  hosts: all
+  become: true
+  roles:
+    - k8s_node
+
+- name: Initialize the control plane on the master node
+  hosts: master
+  become: true
+  roles:
+    - k8s_master
+
+- name: Join worker nodes to the cluster
+  hosts: workers
+  become: true
+  roles:
+    - k8s_worker

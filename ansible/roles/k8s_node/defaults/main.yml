@@ -1,0 +1,9 @@
+---
+# Full Debian package version, including build suffix (apt shows the exact
+# string via `apt-cache madison kubeadm`). Bump this to upgrade the cluster;
+# packages are held to prevent accidental upgrades.
+k8s_version: "1.31.4-1.1"
+
+# Apt repository channel derived from the version (e.g. 1.31.4-1.1 -> v1.31).
+k8s_repo_channel: "v{{ k8s_version.split('.')[0:2] | join('.') }}"
+k8s_keyring: /etc/apt/keyrings/kubernetes-apt.gpg

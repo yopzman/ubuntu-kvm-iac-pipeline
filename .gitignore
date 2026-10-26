@@ -13,7 +13,7 @@ terraform/crash.log
 
 # Ansible
 ansible/*.retry
-ansible/hosts
+ansible/inventory/generated.ini
 
 # General
 *.log

@@ -8,6 +8,11 @@ variable "cluster_name" {
   type        = string
   description = "Name prefix for all resources (domains, volumes, cloud-init)."
   default     = "k8s-lab"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]*$", var.cluster_name))
+    error_message = "cluster_name must be lowercase alphanumeric with dashes and start with a letter."
+  }
 }
 
 variable "pool_name" {
@@ -56,34 +61,64 @@ variable "master_count" {
   type        = number
   description = "Number of master VMs."
   default     = 1
+
+  validation {
+    condition     = var.master_count >= 1
+    error_message = "At least one master node is required."
+  }
 }
 
 variable "worker_count" {
   type        = number
   description = "Number of worker VMs."
   default     = 2
+
+  validation {
+    condition     = var.worker_count >= 1
+    error_message = "At least one worker node is required."
+  }
 }
 
 variable "master_vcpu" {
   type        = number
   description = "vCPUs per master VM."
   default     = 2
+
+  validation {
+    condition     = var.master_vcpu >= 1
+    error_message = "master_vcpu must be at least 1."
+  }
 }
 
 variable "master_memory_mb" {
   type        = number
   description = "RAM (MiB) per master VM."
   default     = 4096
+
+  validation {
+    condition     = var.master_memory_mb >= 1024
+    error_message = "master_memory_mb must be at least 1024 MiB."
+  }
 }
 
 variable "worker_vcpu" {
   type        = number
   description = "vCPUs per worker VM."
   default     = 2
+
+  validation {
+    condition     = var.worker_vcpu >= 1
+    error_message = "worker_vcpu must be at least 1."
+  }
 }
 
 variable "worker_memory_mb" {
   type        = number
   description = "RAM (MiB) per worker VM."
   default     = 4096
+
+  validation {
+    condition     = var.worker_memory_mb >= 1024
+    error_message = "worker_memory_mb must be at least 1024 MiB."
+  }
 }

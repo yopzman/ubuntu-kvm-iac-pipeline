@@ -1,0 +1,59 @@
+---
+- name: Install repository prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gpg
+    state: present
+
+- name: Create the apt keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Download and dearmor the Kubernetes apt key
+  ansible.builtin.shell: >
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_channel }}/deb/Release.key
+    | gpg --dearmor --yes -o {{ k8s_keyring }}
+  args:
+    creates: "{{ k8s_keyring }}"
+
+- name: Add the Kubernetes apt repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/kubernetes.list
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      deb [signed-by={{ k8s_keyring }}] https://pkgs.k8s.io/core:/stable:/{{ k8s_repo_channel }}/deb/ /
+  register: k8s_repo
+
+- name: Update apt cache after repository change
+  ansible.builtin.apt:
+    update_cache: true
+  when: k8s_repo is changed
+
+- name: Install pinned Kubernetes packages
+  ansible.builtin.apt:
+    name:
+      - "kubeadm={{ k8s_version }}"
+      - "kubelet={{ k8s_version }}"
+      - "kubectl={{ k8s_version }}"
+    state: present
+
+- name: Hold Kubernetes packages to prevent accidental upgrades
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Enable kubelet
+  ansible.builtin.service:
+    name: kubelet
+    enabled: true

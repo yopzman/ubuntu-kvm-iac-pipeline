@@ -1,0 +1,54 @@
+---
+- name: Check whether the cluster is already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/manifests/kube-apiserver.yaml
+  register: k8s_control_plane
+
+- name: Initialize the control plane with kubeadm
+  ansible.builtin.command: >
+    kubeadm init
+    --pod-network-cidr={{ pod_network_cidr }}
+    --node-name {{ inventory_hostname }}
+  register: kubeadm_init
+  changed_when: "'Your Kubernetes control-plane has initialized successfully' in kubeadm_init.stdout"
+  when: not k8s_control_plane.stat.exists
+
+- name: Wait for the Kubernetes API to become ready
+  ansible.builtin.command:
+    cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw=/readyz
+  register: api_ready
+  until: api_ready.rc == 0
+  retries: 30
+  delay: 10
+  changed_when: false
+
+- name: Create the kubeconfig directory for the admin user
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.kube"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0700"
+
+- name: Copy the admin kubeconfig for the admin user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "/home/{{ ansible_user }}/.kube/config"
+    remote_src: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+
+- name: Install the pod network (Flannel)
+  ansible.builtin.command:
+    cmd: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f {{ cni_manifest_url }}
+  register: cni_apply
+  until: cni_apply.rc == 0
+  retries: 6
+  delay: 10
+  changed_when: "'configured' in cni_apply.stdout or 'created' in cni_apply.stdout"
+
+- name: Generate the worker join command
+  ansible.builtin.command: kubeadm token create --print-join-command
+  register: kubeadm_join_command
+  changed_when: false

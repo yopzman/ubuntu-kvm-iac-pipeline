@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars and adjust as needed:
+#   cp terraform.tfvars.example terraform.tfvars
+
+# cluster_name     = "k8s-lab"
+# pool_name        = "k8s-lab-vms"
+# pool_path        = "/var/lib/libvirt/k8s-lab-vms"
+# base_image_path  = "../packer/output-qemu/ubuntu-noble-kvm.qcow2"
+# network_name     = "default"
+
+# admin_user          = "ubuntu"
+# ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+
+# master_count     = 1
+# worker_count     = 2
+# master_vcpu      = 2
+# master_memory_mb = 4096
+# worker_vcpu      = 2
+# worker_memory_mb = 4096
