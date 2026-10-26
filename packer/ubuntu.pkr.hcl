@@ -4,6 +4,10 @@ packer {
       source  = "github.com/hashicorp/qemu"
       version = ">= 1.1.0"
     }
+    ansible = {
+      source  = "github.com/hashicorp/ansible"
+      version = ">= 1.1.0"
+    }
   }
 }
 
@@ -13,13 +17,13 @@ packer {
 
 variable "ubuntu_version" {
   type        = string
-  default     = "24.04.2"
+  default     = "24.04.5"
   description = "Ubuntu Server LTS point release used as the ISO source."
 }
 
 variable "iso_url" {
   type        = string
-  default     = "https://releases.ubuntu.com/noble/ubuntu-24.04.2-live-server-amd64.iso"
+  default     = "https://releases.ubuntu.com/noble/ubuntu-24.04.5-live-server-amd64.iso"
   description = "Ubuntu live-server ISO URL (override for a newer point release)."
 }
 
@@ -124,6 +128,6 @@ build {
   }
 
   post-processor "manifest" {
-    output_file = "packer-manifest.json"
+    output = "packer-manifest.json"
   }
 }

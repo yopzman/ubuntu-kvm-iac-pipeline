@@ -3,8 +3,10 @@ terraform {
 
   required_providers {
     libvirt = {
-      source  = "dmacvicar/libvirt"
-      version = "~> 0.8"
+      source = "dmacvicar/libvirt"
+      # Pinned to the 0.8 series: the 0.9 rewrite of libvirt_domain uses a
+      # completely different schema (no disk/network_interface blocks).
+      version = ">= 0.8.3, < 0.9.0"
     }
   }
 }

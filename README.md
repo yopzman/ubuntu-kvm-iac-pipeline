@@ -100,6 +100,8 @@ cd ../terraform && terraform init && terraform apply    # or: make cluster
 
 Each VM gets a cloud-init disk (hostname `master-1` / `worker-1` / `worker-2`, user `ubuntu` + your SSH key, password login disabled) and a qcow2 disk backed by the golden image. VMs use the libvirt `default` network (DHCP, `192.168.122.0/24`); IP detection uses the qemu guest agent baked into the image. Override any setting via `terraform.tfvars` (see `terraform.tfvars.example`).
 
+> The `dmacvicar/libvirt` provider is pinned to the 0.8 series (`>= 0.8.3, < 0.9.0`): the 0.9 rewrite of `libvirt_domain` uses a completely different schema (no `disk`/`network_interface` blocks). Commit `.terraform.lock.hcl` so every machine resolves the same provider version.
+
 ### 3. Baseline configuration with Ansible
 
 `make configure` regenerates `ansible/inventory/generated.ini` from the Terraform state, then applies `site.yml` (all roles are idempotent — baked settings are simply re-verified):
@@ -137,6 +139,7 @@ Checks containerd/qemu-guest-agent/kubelet/node-exporter are active, swap is off
 ## Notes
 
 - **Make sure SSH key access works before running the playbook** — the hardening role disables SSH password login.
+- `releases.ubuntu.com` only hosts the latest Noble point release: when a new one ships, update the `ubuntu_version` and `iso_url` defaults in `packer/ubuntu.pkr.hcl` (the CI `packer validate` step fails on a stale URL, so the breakage is caught immediately).
 - IPs are assigned via DHCP; if you ever recreate the VMs, rerun `make inventory` (or `make configure`, which does it for you). For stable leases, add MAC-based reservations to the libvirt network.
 - If `kubeadm init` fails halfway, clean up with `kubeadm reset -f` on the affected node and rerun `make k8s`.
 - The pod CIDR (`10.244.0.0/16`) is deliberately different from the libvirt network (`192.168.122.0/24`) to avoid routing conflicts — keep this in mind when switching CNIs.

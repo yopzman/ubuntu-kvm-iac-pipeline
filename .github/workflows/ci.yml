@@ -57,7 +57,7 @@ jobs:
 
       - name: ansible-lint (advisory)
         run: ansible-lint ansible/
-        continue-on-error: true # tighten once the codebase is fully clean
+        continue-on-error: true  # tighten once the codebase is fully clean
 
   e2e:
     name: End-to-end (self-hosted KVM runner)
