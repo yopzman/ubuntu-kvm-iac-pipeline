@@ -53,8 +53,10 @@
     state: absent
     remove: true
     force: true
+  when: not bake_image
 
 - name: Remove the temporary sudoers file for the packer user
   ansible.builtin.file:
     path: /etc/sudoers.d/99-packer
     state: absent
+  when: not bake_image

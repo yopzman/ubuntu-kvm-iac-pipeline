@@ -1,0 +1,5 @@
+---
+# Set to true when the role runs inside the Packer build (see
+# ansible/image-bake.yml) - keeps the temporary builder user alive so
+# Packer can stay connected until the build finishes.
+bake_image: false

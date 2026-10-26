@@ -10,3 +10,4 @@
     - swap_off
     - kernel_params
     - container_prereq
+    - monitoring

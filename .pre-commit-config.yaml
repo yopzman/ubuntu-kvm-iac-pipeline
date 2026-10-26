@@ -1,0 +1,37 @@
+# Install once on the control host:
+#   pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.96.1
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+
+  - repo: local
+    hooks:
+      - id: packer-fmt
+        name: packer fmt -check
+        language: system
+        pass_filenames: false
+        entry: bash -c "cd packer && packer fmt -check ."
+
+      - id: ansible-lint
+        name: ansible-lint
+        language: system
+        pass_filenames: false
+        entry: bash -c "cd ansible && ansible-lint"
+
+      - id: yamllint
+        name: yamllint
+        language: system
+        entry: yamllint
+        types: [yaml]

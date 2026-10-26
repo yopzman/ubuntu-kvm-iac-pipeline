@@ -95,20 +95,31 @@ source "qemu" "ubuntu" {
 }
 
 # ---------------------------------------------------------------------------
-# Build: update packages, then write the manifest
+# Build: OS updates, bake the baseline with Ansible, write the manifest
 # ---------------------------------------------------------------------------
 
 build {
   sources = ["source.qemu.ubuntu"]
 
+  # OS updates only - packages and hardening are handled by the
+  # autoinstall file and the Ansible provisioner below.
   provisioner "shell" {
     execute_command = "echo '${var.ssh_password}' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'"
     inline = [
       "apt-get update",
       "apt-get -y dist-upgrade",
-      "apt-get -y install qemu-guest-agent python3",
       "apt-get -y autoremove",
       "apt-get clean",
+    ]
+  }
+
+  # Bake the baseline roles (common + hardening) into the image.
+  # Requires ansible and sshpass on the build host (password communicator).
+  provisioner "ansible" {
+    playbook_file = "../ansible/image-bake.yml"
+    extra_arguments = [
+      "-e",
+      "ansible_ssh_common_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
     ]
   }
 

@@ -1,0 +1,15 @@
+---
+# Applied inside the Packer build (provisioner "ansible" in
+# packer/ubuntu.pkr.hcl). bake_image=true skips node-specific tasks:
+# hostname configuration and removal of the temporary builder user.
+- name: Bake baseline configuration into the golden image
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    bake_image: true
+
+  roles:
+    - role: common
+    - role: hardening

@@ -42,6 +42,7 @@
 - name: Set hostname to match inventory
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
+  when: not bake_image
 
 - name: Enable qemu-guest-agent
   ansible.builtin.service:

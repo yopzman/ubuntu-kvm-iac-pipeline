@@ -1,2 +1,6 @@
 ---
 timezone: "Asia/Jakarta"
+
+# Set to true when the role runs inside the Packer build (see
+# ansible/image-bake.yml) - skips node-specific configuration.
+bake_image: false

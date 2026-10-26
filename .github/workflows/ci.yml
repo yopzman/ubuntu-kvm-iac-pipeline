@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  TF_VERSION: "1.9.8"
+  PACKER_VERSION: "1.11.2"
+
+jobs:
+  lint:
+    name: Lint & validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install Terraform and Packer
+        run: |
+          bindir="$HOME/.local/bin"
+          mkdir -p "$bindir"
+          curl -fsSL -o /tmp/terraform.zip \
+            "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+          unzip -o /tmp/terraform.zip -d "$bindir"
+          curl -fsSL -o /tmp/packer.zip \
+            "https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip"
+          unzip -o /tmp/packer.zip -d "$bindir"
+          echo "$bindir" >> "$GITHUB_PATH"
+
+      - name: Install Ansible tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core ansible-lint yamllint
+
+      - name: Terraform fmt & validate
+        run: |
+          cd terraform
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - name: Packer fmt & validate
+        run: |
+          cd packer
+          packer fmt -check .
+          packer init .
+          packer validate .
+
+      - name: yamllint
+        run: yamllint .
+
+      - name: Python compile check
+        run: python -m py_compile scripts/generate-inventory.py
+
+      - name: ansible-lint (advisory)
+        run: ansible-lint ansible/
+        continue-on-error: true # tighten once the codebase is fully clean
+
+  e2e:
+    name: End-to-end (self-hosted KVM runner)
+    # Manual dispatch only: requires a self-hosted runner with the `kvm` label
+    # on the hypervisor host, with Packer/Terraform/Ansible/sshpass installed.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, kvm]
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Build image, provision VMs, configure, bootstrap, verify
+        run: |
+          make image
+          make cluster-auto
+          make configure
+          make k8s
+          make verify
+
+      - name: Tear down
+        if: always()
+        run: cd terraform && terraform destroy -auto-approve
