@@ -1,0 +1,50 @@
+---
+- name: Update cache apt
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade paket yang tersedia
+  ansible.builtin.apt:
+    upgrade: safe
+
+- name: Install paket dasar
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - htop
+      - lsof
+      - net-tools
+      - python3
+      - unzip
+      - vim
+      - wget
+    state: present
+
+- name: Set timezone node
+  ansible.builtin.file:
+    src: "/usr/share/zoneinfo/{{ timezone }}"
+    dest: /etc/localtime
+    state: link
+    force: true
+  notify: Restart systemd-timesyncd
+
+- name: Tulis /etc/timezone
+  ansible.builtin.copy:
+    content: "{{ timezone }}\n"
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Set hostname sesuai inventory
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Aktifkan qemu-guest-agent
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    state: started
+    enabled: true

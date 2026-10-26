@@ -1,0 +1,12 @@
+---
+- name: Inisialisasi semua node cluster (master + worker)
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - hardening
+    - swap_off
+    - kernel_params
+    - container_prereq

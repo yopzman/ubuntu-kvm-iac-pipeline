@@ -1,0 +1,21 @@
+# Packer
+packer/output-qemu/
+packer/packer_cache/
+packer/packer-manifest.json
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl.bak
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfplan
+terraform/crash.log
+
+# Ansible
+ansible/*.retry
+ansible/hosts
+
+# Umum
+*.log
+*.swp
+.DS_Store

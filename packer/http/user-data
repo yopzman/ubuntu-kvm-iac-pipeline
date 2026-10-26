@@ -1,0 +1,32 @@
+#cloud-config
+# Autoinstall Ubuntu Server untuk Packer QEMU builder.
+# Password di bawah adalah hash SHA-512 dari "packer" (user sementara,
+# akan dihapus oleh role Ansible "hardening" setelah provisioning).
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+
+  identity:
+    hostname: packer-builder
+    username: packer
+    password: "$6$5o8eK8DvAA0C2UbU$xrFB1Opa5vgbJc01Drgiq09BEzEJTss6jpCAhoof3VMK2BjD2ZFpPyEWSCAUgoNRY7aGAvnMSs2C7tyKW4gTd1"
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  storage:
+    layout:
+      name: direct
+
+  packages:
+    - qemu-guest-agent
+    - python3
+    - openssh-server
+
+  late-commands:
+    - echo 'packer ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/99-packer
+    - chmod 0440 /target/etc/sudoers.d/99-packer
+    - curtin in-target -- systemctl enable qemu-guest-agent
